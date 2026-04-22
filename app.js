@@ -43,3 +43,229 @@ function calculate(stocks, targets, freeCash) {
 
   return { buy, remainder };
 }
+
+// ── State ──────────────────────────────────────────────────────────────
+let nextId = 3;
+const state = {
+  stocks: [
+    { id: 1, label: '', amount: 0 },
+    { id: 2, label: '', amount: 0 },
+  ],
+  targets: { 1: 50, 2: 50 },
+  freeCash: 0,
+  results: null,
+};
+
+// ── Derived ────────────────────────────────────────────────────────────
+function total()      { return state.stocks.reduce((s, st) => s + st.amount, 0); }
+function targetSum()  { return Object.values(state.targets).reduce((s, v) => s + v, 0); }
+function currentPct(stock) {
+  const t = total();
+  return t === 0 ? 0 : (stock.amount / t) * 100;
+}
+
+// ── Render ─────────────────────────────────────────────────────────────
+function render() {
+  renderTable();
+  renderCards();
+  renderFooter();
+  renderResults();
+}
+
+function renderTable() {
+  const tbody = document.getElementById('stocksBody');
+  const tfoot = document.getElementById('stocksFoot');
+  tbody.innerHTML = '';
+
+  state.stocks.forEach(stock => {
+    const buy = state.results ? state.results.buy[stock.id] : null;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="col-name">
+        <input class="name-input" data-id="${stock.id}" data-field="label"
+               placeholder="Stock ${stock.id}" value="${stock.label}">
+      </td>
+      <td>
+        <input class="amount-input" data-id="${stock.id}" data-field="amount"
+               type="number" min="0" placeholder="0" value="${stock.amount || ''}">
+      </td>
+      <td class="current-pct">${currentPct(stock).toFixed(1)}%</td>
+      <td>
+        <input class="target-input" data-id="${stock.id}" data-field="target"
+               type="number" min="0" max="100" placeholder="0"
+               value="${state.targets[stock.id] || ''}">
+      </td>
+      <td class="col-buy">${buy !== null ? '₪' + buy : '—'}</td>
+      <td class="col-remove">
+        <button class="remove-btn" data-id="${stock.id}"
+                ${state.stocks.length <= 2 ? 'disabled' : ''}>✕</button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  const ts = targetSum();
+  const totalBuy = state.results
+    ? Object.values(state.results.buy).reduce((s, v) => s + v, 0)
+    : null;
+
+  tfoot.innerHTML = `
+    <tr>
+      <td class="col-name"></td>
+      <td style="text-align:right;color:var(--text);font-weight:600">
+        ₪${total().toLocaleString()}
+      </td>
+      <td style="text-align:right;color:var(--text-dim)">100%</td>
+      <td style="text-align:right">
+        <span class="${ts === 100 ? 'target-sum-ok' : 'target-sum-err'}">
+          ${ts}% ${ts === 100 ? '✓' : '✗'}
+        </span>
+      </td>
+      <td class="col-buy">${totalBuy !== null ? '₪' + totalBuy : '—'}</td>
+      <td></td>
+    </tr>
+  `;
+
+  document.getElementById('totalDisplay').textContent =
+    total() > 0 ? `Total: ₪${total().toLocaleString()}` : '';
+}
+
+function renderCards() {
+  const wrap = document.getElementById('cardsWrap');
+  wrap.innerHTML = '';
+
+  state.stocks.forEach(stock => {
+    const buy = state.results ? state.results.buy[stock.id] : null;
+    const div = document.createElement('div');
+    div.className = 'stock-card';
+    div.innerHTML = `
+      <div class="stock-card-header">
+        <input class="name-input field-val" data-id="${stock.id}" data-field="label"
+               placeholder="Stock ${stock.id}" value="${stock.label}">
+        <button class="remove-btn" data-id="${stock.id}"
+                ${state.stocks.length <= 2 ? 'disabled' : ''}>✕</button>
+      </div>
+      <div class="stock-card-grid">
+        <div class="card-field">
+          <label>Amount (₪)</label>
+          <input class="field-val" data-id="${stock.id}" data-field="amount"
+                 type="number" min="0" placeholder="0" value="${stock.amount || ''}">
+        </div>
+        <div class="card-field">
+          <label>Current %</label>
+          <div class="field-val is-pct">${currentPct(stock).toFixed(1)}%</div>
+        </div>
+        <div class="card-field">
+          <label>Target %</label>
+          <input class="field-val" data-id="${stock.id}" data-field="target"
+                 type="number" min="0" max="100" placeholder="0"
+                 value="${state.targets[stock.id] || ''}">
+        </div>
+        <div class="card-field">
+          <label>Buy (₪)</label>
+          <div class="field-val is-buy">${buy !== null ? '₪' + buy : '—'}</div>
+        </div>
+      </div>
+    `;
+    wrap.appendChild(div);
+  });
+}
+
+function renderFooter() {
+  const ts = targetSum();
+  const fc = state.freeCash;
+  const btn = document.getElementById('calcBtn');
+  btn.disabled = !(ts === 100 && fc > 0);
+}
+
+function renderResults() {
+  const allocEl   = document.getElementById('newAlloc');
+  const noticeEl  = document.getElementById('unallocatedNotice');
+
+  if (!state.results) {
+    allocEl.hidden  = true;
+    noticeEl.hidden = true;
+    return;
+  }
+
+  const t = total() + state.freeCash;
+  const parts = state.stocks.map(st => {
+    const newAmt = st.amount + (state.results.buy[st.id] || 0);
+    return `<span>${st.label || 'Stock ' + st.id}: ${t > 0 ? ((newAmt / t) * 100).toFixed(1) : 0}%</span>`;
+  });
+  allocEl.innerHTML = 'New allocation after purchase: ' + parts.join(' / ');
+  allocEl.hidden = false;
+
+  if (state.results.remainder > 0) {
+    noticeEl.textContent =
+      `₪${state.results.remainder} could not be allocated — all targets already met or exceeded.`;
+    noticeEl.hidden = false;
+  } else {
+    noticeEl.hidden = true;
+  }
+}
+
+// ── Events ─────────────────────────────────────────────────────────────
+
+document.addEventListener('input', e => {
+  const id = e.target.dataset.id ? Number(e.target.dataset.id) : null;
+  const field = e.target.dataset.field;
+
+  if (id && field === 'label') {
+    state.stocks.find(s => s.id === id).label = e.target.value;
+  }
+  if (id && field === 'amount') {
+    state.stocks.find(s => s.id === id).amount = parseFloat(e.target.value) || 0;
+    state.results = null;
+    render();
+    return;
+  }
+  if (id && field === 'target') {
+    state.targets[id] = parseFloat(e.target.value) || 0;
+    state.results = null;
+    renderFooter();
+    // update tfoot sum indicator without full re-render (avoids losing focus)
+    const ts = targetSum();
+    const span = document.querySelector('tfoot .target-sum-ok, tfoot .target-sum-err');
+    if (span) {
+      span.className = ts === 100 ? 'target-sum-ok' : 'target-sum-err';
+      span.textContent = `${ts}% ${ts === 100 ? '✓' : '✗'}`;
+    }
+    return;
+  }
+
+  if (e.target.id === 'freeCashInput') {
+    state.freeCash = parseFloat(e.target.value) || 0;
+    state.results = null;
+    renderFooter();
+  }
+});
+
+document.addEventListener('click', e => {
+  // Remove stock
+  if (e.target.classList.contains('remove-btn') && !e.target.disabled) {
+    const id = Number(e.target.dataset.id);
+    state.stocks = state.stocks.filter(s => s.id !== id);
+    delete state.targets[id];
+    state.results = null;
+    render();
+  }
+
+  // Add stock
+  if (e.target.id === 'addBtn') {
+    const id = nextId++;
+    state.stocks.push({ id, label: '', amount: 0 });
+    state.targets[id] = 0;
+    state.results = null;
+    render();
+  }
+
+  // Calculate
+  if (e.target.id === 'calcBtn') {
+    state.results = calculate(state.stocks, state.targets, state.freeCash);
+    render();
+  }
+});
+
+// ── Boot ───────────────────────────────────────────────────────────────
+render();
