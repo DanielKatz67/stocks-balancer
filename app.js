@@ -44,6 +44,14 @@ function calculate(stocks, targets, freeCash) {
   return { buy, remainder };
 }
 
+function esc(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
 // ── State ──────────────────────────────────────────────────────────────
 let nextId = 3;
 const state = {
@@ -83,7 +91,7 @@ function renderTable() {
     tr.innerHTML = `
       <td class="col-name">
         <input class="name-input" data-id="${stock.id}" data-field="label"
-               placeholder="Stock ${stock.id}" value="${stock.label}">
+               placeholder="Stock ${stock.id}" value="${esc(stock.label)}">
       </td>
       <td>
         <input class="amount-input" data-id="${stock.id}" data-field="amount"
@@ -141,7 +149,7 @@ function renderCards() {
     div.innerHTML = `
       <div class="stock-card-header">
         <input class="name-input field-val" data-id="${stock.id}" data-field="label"
-               placeholder="Stock ${stock.id}" value="${stock.label}">
+               placeholder="Stock ${stock.id}" value="${esc(stock.label)}">
         <button class="remove-btn" data-id="${stock.id}"
                 ${state.stocks.length <= 2 ? 'disabled' : ''}>✕</button>
       </div>
@@ -189,11 +197,19 @@ function renderResults() {
   }
 
   const t = total() + state.freeCash;
-  const parts = state.stocks.map(st => {
+  allocEl.textContent = '';
+  const prefix = document.createTextNode('New allocation after purchase: ');
+  allocEl.appendChild(prefix);
+  state.stocks.forEach((st, i) => {
     const newAmt = st.amount + (state.results.buy[st.id] || 0);
-    return `<span>${st.label || 'Stock ' + st.id}: ${t > 0 ? ((newAmt / t) * 100).toFixed(1) : 0}%</span>`;
+    const pct = t > 0 ? ((newAmt / t) * 100).toFixed(1) : (0).toFixed(1);
+    const span = document.createElement('span');
+    span.textContent = `${st.label || 'Stock ' + st.id}: ${pct}%`;
+    allocEl.appendChild(span);
+    if (i < state.stocks.length - 1) {
+      allocEl.appendChild(document.createTextNode(' / '));
+    }
   });
-  allocEl.innerHTML = 'New allocation after purchase: ' + parts.join(' / ');
   allocEl.hidden = false;
 
   if (state.results.remainder > 0) {
@@ -213,6 +229,7 @@ document.addEventListener('input', e => {
 
   if (id && field === 'label') {
     state.stocks.find(s => s.id === id).label = e.target.value;
+    renderResults();
   }
   if (id && field === 'amount') {
     state.stocks.find(s => s.id === id).amount = parseFloat(e.target.value) || 0;
@@ -223,6 +240,10 @@ document.addEventListener('input', e => {
   if (id && field === 'target') {
     state.targets[id] = parseFloat(e.target.value) || 0;
     state.results = null;
+    // Clear stale buy column cells
+    document.querySelectorAll('tbody .col-buy').forEach(td => { td.textContent = '—'; });
+    document.querySelectorAll('#stocksFoot .col-buy').forEach(td => { td.textContent = '—'; });
+    document.querySelectorAll('.card-field .is-buy').forEach(div => { div.textContent = '—'; });
     renderFooter();
     // update tfoot sum indicator without full re-render (avoids losing focus)
     const ts = targetSum();
