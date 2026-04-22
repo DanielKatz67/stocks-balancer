@@ -1,5 +1,6 @@
 // logic added in Tasks 2 and 4
 
+// KEEP IN SYNC WITH tests/calc.test.js
 /**
  * @param {Array<{id: number, amount: number}>} stocks
  * @param {Object<number, number>} targets  e.g. { 1: 60, 2: 40 }

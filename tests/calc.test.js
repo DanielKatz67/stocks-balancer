@@ -2,7 +2,7 @@
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
 
-// Inline the function under test (no module system in the browser build)
+// KEEP IN SYNC WITH app.js — no module system in the browser build (no module system in the browser build)
 function calculate(stocks, targets, freeCash) {
   const total = stocks.reduce((s, st) => s + st.amount, 0);
   const grandTotal = total + freeCash;
