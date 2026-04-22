@@ -10,10 +10,24 @@ function calculate(stocks, targets, freeCash) {
   stocks.forEach(st => {
     rawBuy[st.id] = (targets[st.id] / 100) * grandTotal - st.amount;
   });
+  // Distribute freeCash proportionally across underweight stocks
+  const positiveRaw = {};
+  let positiveSum = 0;
+  stocks.forEach(st => {
+    if (rawBuy[st.id] > 0) {
+      positiveRaw[st.id] = rawBuy[st.id];
+      positiveSum += rawBuy[st.id];
+    }
+  });
+
   const buy = {};
   stocks.forEach(st => {
-    const capped = Math.min(Math.max(0, rawBuy[st.id]), freeCash);
-    buy[st.id] = Math.floor(capped / 10) * 10;
+    if (positiveRaw[st.id] === undefined) {
+      buy[st.id] = 0;
+    } else {
+      const share = (positiveRaw[st.id] / positiveSum) * freeCash;
+      buy[st.id] = Math.floor(share / 10) * 10;
+    }
   });
   const allocated = Object.values(buy).reduce((s, v) => s + v, 0);
   let remainder = freeCash - allocated;
@@ -75,5 +89,16 @@ test('rounds each allocation down to nearest 10', () => {
   const targets = { 1: 33, 2: 67 };
   const { buy } = calculate(stocks, targets, 100);
   assert.equal(buy[1] % 10, 0);
+  assert.equal(buy[2] % 10, 0);
+});
+
+test('3 stocks: proportional allocation never exceeds freeCash', () => {
+  const stocks = [{ id: 1, amount: 4000 }, { id: 2, amount: 4000 }, { id: 3, amount: 4000 }];
+  const targets = { 1: 40, 2: 40, 3: 20 };
+  const { buy, remainder } = calculate(stocks, targets, 1000);
+  assert.equal(buy[3], 0);                          // stock3 is overweight
+  assert.ok(buy[1] + buy[2] + buy[3] <= 1000);      // never exceed freeCash
+  assert.ok(remainder >= 0);                         // remainder non-negative
+  assert.equal(buy[1] % 10, 0);                      // all multiples of 10
   assert.equal(buy[2] % 10, 0);
 });

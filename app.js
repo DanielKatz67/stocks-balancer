@@ -17,10 +17,24 @@ function calculate(stocks, targets, freeCash) {
     rawBuy[st.id] = desired - st.amount;
   });
 
+  // Distribute freeCash proportionally across underweight stocks
+  const positiveRaw = {};
+  let positiveSum = 0;
+  stocks.forEach(st => {
+    if (rawBuy[st.id] > 0) {
+      positiveRaw[st.id] = rawBuy[st.id];
+      positiveSum += rawBuy[st.id];
+    }
+  });
+
   const buy = {};
   stocks.forEach(st => {
-    const capped = Math.min(Math.max(0, rawBuy[st.id]), freeCash);
-    buy[st.id] = Math.floor(capped / 10) * 10;
+    if (positiveRaw[st.id] === undefined) {
+      buy[st.id] = 0;
+    } else {
+      const share = (positiveRaw[st.id] / positiveSum) * freeCash;
+      buy[st.id] = Math.floor(share / 10) * 10;
+    }
   });
 
   const allocated = Object.values(buy).reduce((s, v) => s + v, 0);
@@ -49,7 +63,8 @@ function esc(str) {
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }
 
 // ── State ──────────────────────────────────────────────────────────────
@@ -214,7 +229,7 @@ function renderResults() {
 
   if (state.results.remainder > 0) {
     noticeEl.textContent =
-      `₪${state.results.remainder} could not be allocated — all targets already met or exceeded.`;
+      `₪${state.results.remainder} could not be allocated — remainder is too small to round to ₪10.`;
     noticeEl.hidden = false;
   } else {
     noticeEl.hidden = true;
