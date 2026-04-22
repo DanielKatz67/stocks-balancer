@@ -45,29 +45,29 @@ test('never sells an overweight stock', () => {
   // stock1 is 70% but target is 60% — buy should be 0
   const stocks = [{ id: 1, amount: 7000 }, { id: 2, amount: 3000 }];
   const targets = { 1: 60, 2: 40 };
-  const { buy } = calculate(stocks, targets, 1000);
+  const { buy, remainder } = calculate(stocks, targets, 1000);
   assert.equal(buy[1], 0);
   assert.ok(buy[2] > 0);
+  assert.equal(buy[2], 1000);
+  assert.equal(remainder, 0);
 });
 
 test('remainder goes to most-underweight stock', () => {
   const stocks = [{ id: 1, amount: 0 }, { id: 2, amount: 0 }];
   const targets = { 1: 50, 2: 50 };
   const { buy, remainder } = calculate(stocks, targets, 15);
-  assert.equal(buy[1] % 10, 0);
-  assert.equal(buy[2] % 10, 0);
-  assert.ok(buy[1] + buy[2] <= 15);
-  assert.ok(remainder >= 0);
+  assert.equal(buy[1], 10);
+  assert.equal(buy[2], 0);
+  assert.equal(remainder, 5);
 });
 
-test('unallocatable when all stocks overweight', () => {
+test('stock1 overweight receives zero; stock2 underweight absorbs all free cash', () => {
   const stocks = [{ id: 1, amount: 8000 }, { id: 2, amount: 2000 }];
   const targets = { 1: 50, 2: 50 };
   const { buy, remainder } = calculate(stocks, targets, 100);
   assert.equal(buy[1], 0);
-  assert.ok(buy[2] >= 0);
-  assert.ok(remainder >= 0);
-  assert.ok(buy[1] + buy[2] <= 100);
+  assert.equal(buy[2], 100);
+  assert.equal(remainder, 0);
 });
 
 test('rounds each allocation down to nearest 10', () => {
