@@ -18,8 +18,8 @@ function calculate(stocks, targets, freeCash) {
 
   const buy = {};
   stocks.forEach(st => {
-    const floored = Math.floor(Math.max(0, rawBuy[st.id]) / 10) * 10;
-    buy[st.id] = floored;
+    const capped = Math.min(Math.max(0, rawBuy[st.id]), freeCash);
+    buy[st.id] = Math.floor(capped / 10) * 10;
   });
 
   const allocated = Object.values(buy).reduce((s, v) => s + v, 0);
@@ -34,8 +34,9 @@ function calculate(stocks, targets, freeCash) {
       if (gap > bestGap) { bestGap = gap; bestId = st.id; }
     });
     if (bestId !== null && bestGap > 0) {
-      buy[bestId] += remainder;
-      remainder = 0;
+      const toAdd = Math.floor(remainder / 10) * 10;
+      buy[bestId] += toAdd;
+      remainder -= toAdd;
     }
   }
 

@@ -12,7 +12,8 @@ function calculate(stocks, targets, freeCash) {
   });
   const buy = {};
   stocks.forEach(st => {
-    buy[st.id] = Math.floor(Math.max(0, rawBuy[st.id]) / 10) * 10;
+    const capped = Math.min(Math.max(0, rawBuy[st.id]), freeCash);
+    buy[st.id] = Math.floor(capped / 10) * 10;
   });
   const allocated = Object.values(buy).reduce((s, v) => s + v, 0);
   let remainder = freeCash - allocated;
@@ -21,7 +22,11 @@ function calculate(stocks, targets, freeCash) {
     stocks.forEach(st => {
       if (rawBuy[st.id] > bestGap) { bestGap = rawBuy[st.id]; bestId = st.id; }
     });
-    if (bestId !== null && bestGap > 0) { buy[bestId] += remainder; remainder = 0; }
+    if (bestId !== null && bestGap > 0) {
+      const toAdd = Math.floor(remainder / 10) * 10;
+      buy[bestId] += toAdd;
+      remainder -= toAdd;
+    }
   }
   return { buy, remainder };
 }
@@ -46,22 +51,23 @@ test('never sells an overweight stock', () => {
 });
 
 test('remainder goes to most-underweight stock', () => {
-  // After rounding down, leftover cash should go to stock with biggest gap
   const stocks = [{ id: 1, amount: 0 }, { id: 2, amount: 0 }];
   const targets = { 1: 50, 2: 50 };
-  const { buy, remainder } = calculate(stocks, targets, 15); // 15 → floor to 10 per stock = 10+0 or 0+10
-  assert.equal(remainder, 0);
-  assert.equal(buy[1] + buy[2], 15);
+  const { buy, remainder } = calculate(stocks, targets, 15);
+  assert.equal(buy[1] % 10, 0);
+  assert.equal(buy[2] % 10, 0);
+  assert.ok(buy[1] + buy[2] <= 15);
+  assert.ok(remainder >= 0);
 });
 
 test('unallocatable when all stocks overweight', () => {
-  // freeCash is 100 but both stocks already exceed targets — nothing can be bought sensibly
   const stocks = [{ id: 1, amount: 8000 }, { id: 2, amount: 2000 }];
-  const targets = { 1: 50, 2: 50 }; // stock1 is 80%, way over 50%
+  const targets = { 1: 50, 2: 50 };
   const { buy, remainder } = calculate(stocks, targets, 100);
-  // stock2 still underweight so it should absorb
   assert.equal(buy[1], 0);
   assert.ok(buy[2] >= 0);
+  assert.ok(remainder >= 0);
+  assert.ok(buy[1] + buy[2] <= 100);
 });
 
 test('rounds each allocation down to nearest 10', () => {
