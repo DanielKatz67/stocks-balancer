@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stock Balancer</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="app-header">
+      <h1 class="app-title">Stock Balancer</h1>
+      <span class="total-display" id="totalDisplay"></span>
+    </header>
+
+    <!-- Desktop table (hidden on mobile via CSS) -->
+    <div class="table-wrap">
+      <table class="stocks-table" id="stocksTable">
+        <thead>
+          <tr>
+            <th class="col-name">Stock</th>
+            <th class="col-amount">Amount (₪)</th>
+            <th class="col-current">Current %</th>
+            <th class="col-target">Target %</th>
+            <th class="col-buy">Buy (₪)</th>
+            <th class="col-remove"></th>
+          </tr>
+        </thead>
+        <tbody id="stocksBody"></tbody>
+        <tfoot id="stocksFoot"></tfoot>
+      </table>
+    </div>
+
+    <!-- Mobile cards (hidden on desktop via CSS) -->
+    <div class="cards-wrap" id="cardsWrap"></div>
+
+    <div class="table-actions">
+      <button class="add-btn" id="addBtn">+ Add stock</button>
+    </div>
+
+    <div class="footer-bar">
+      <label class="free-label" for="freeCashInput">Free cash (₪)</label>
+      <input class="free-input" id="freeCashInput" type="number" min="0" placeholder="0">
+      <button class="calc-btn" id="calcBtn" disabled>Calculate →</button>
+    </div>
+
+    <p class="new-alloc" id="newAlloc" hidden></p>
+    <p class="unallocated-notice" id="unallocatedNotice" hidden></p>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>
