@@ -1,1 +1,268 @@
-/* styles added in Task 3 */
+/* ── Reset & custom properties ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:          #0a1520;
+  --bg-card:     #0f1f2e;
+  --bg-input:    #071520;
+  --border:      #1e3a5f;
+  --border-dim:  #111d2e;
+  --text:        #e2e8f0;
+  --text-dim:    #94a3b8;
+  --text-muted:  #475569;
+  --accent:      #0ea5e9;
+  --accent-lt:   #38bdf8;
+  --accent-bg:   rgba(14, 165, 233, 0.08);
+  --accent-bdr:  rgba(14, 165, 233, 0.18);
+  --green:       #10b981;
+  --red:         #f87171;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  min-height: 100vh;
+  padding: 32px 16px;
+}
+
+/* ── Container ── */
+.container {
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+/* ── Header ── */
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 24px;
+}
+.app-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #f1f5f9;
+  letter-spacing: 0.01em;
+}
+.total-display {
+  font-size: 12px;
+  color: var(--accent-lt);
+  font-weight: 600;
+}
+
+/* ── Table (desktop) ── */
+.table-wrap {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+.stocks-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.stocks-table thead th {
+  color: var(--text-muted);
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 12px 10px 10px;
+  text-align: right;
+  border-bottom: 1px solid var(--border-dim);
+}
+.stocks-table thead th.col-name { text-align: left; }
+.stocks-table thead th.col-buy  { color: var(--accent); }
+
+.stocks-table tbody td {
+  padding: 9px 10px;
+  border-bottom: 1px solid var(--border-dim);
+  text-align: right;
+  color: var(--text-dim);
+  vertical-align: middle;
+}
+.stocks-table tbody td.col-name { text-align: left; }
+
+.stocks-table tfoot td {
+  padding: 10px 10px 12px;
+  text-align: right;
+  font-size: 11px;
+  color: var(--text-muted);
+  border-top: 2px solid var(--border);
+}
+.stocks-table tfoot td.col-name { text-align: left; }
+
+/* Buy column highlight */
+.col-buy {
+  background: var(--accent-bg);
+  border-left: 1px solid var(--accent-bdr);
+  color: var(--accent-lt);
+  font-weight: 700;
+}
+tfoot .col-buy { font-weight: 700; color: var(--accent); }
+
+/* Current % */
+.current-pct { color: var(--accent-lt); font-weight: 600; }
+
+/* Target sum indicator */
+.target-sum-ok  { color: var(--green); font-weight: 700; }
+.target-sum-err { color: var(--red);   font-weight: 700; }
+
+/* ── Inputs ── */
+.name-input, .amount-input, .target-input {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  color: var(--text);
+  font-size: 12px;
+  padding: 4px 7px;
+}
+.name-input   { width: 90px; text-align: left; }
+.amount-input { width: 80px; text-align: right; }
+.target-input { width: 52px; text-align: right; }
+
+input:focus { outline: none; border-color: var(--accent); }
+
+input[type="number"]:invalid { border-color: var(--red); }
+
+/* Remove button */
+.remove-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 13px;
+  padding: 2px 4px;
+  border-radius: 3px;
+}
+.remove-btn:hover { color: var(--red); }
+.remove-btn:disabled { opacity: 0.2; cursor: default; }
+
+/* ── Table actions ── */
+.table-actions { margin-bottom: 16px; }
+.add-btn {
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-size: 12px;
+  cursor: pointer;
+  padding: 0;
+}
+.add-btn:hover { text-decoration: underline; }
+
+/* ── Footer bar ── */
+.footer-bar {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 14px;
+}
+.free-label { font-size: 12px; color: var(--text-muted); white-space: nowrap; }
+.free-input {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  color: var(--accent-lt);
+  font-size: 14px;
+  font-weight: 600;
+  padding: 8px 10px;
+  width: 130px;
+  text-align: right;
+}
+.calc-btn {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 7px;
+  padding: 9px 20px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-left: auto;
+  transition: opacity 0.15s;
+}
+.calc-btn:disabled { background: var(--border); color: var(--text-muted); cursor: not-allowed; }
+
+/* ── Post-calculate messages ── */
+.new-alloc {
+  font-size: 12px;
+  color: var(--text-muted);
+  background: #071520;
+  border-left: 2px solid var(--accent);
+  padding: 8px 12px;
+  border-radius: 0 6px 6px 0;
+  margin-bottom: 8px;
+}
+.new-alloc span { color: var(--accent-lt); font-weight: 600; }
+
+.unallocated-notice {
+  font-size: 12px;
+  color: var(--red);
+  padding: 6px 0;
+}
+
+/* ── Accessibility ── */
+.visually-hidden {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ── Mobile cards (hidden on desktop) ── */
+.cards-wrap { display: none; }
+
+@media (max-width: 639px) {
+  .table-wrap  { display: none; }
+  .cards-wrap  { display: block; }
+
+  .stock-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+    margin-bottom: 10px;
+  }
+  .stock-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  .stock-card-header .name-input { width: 100%; font-size: 13px; font-weight: 600; }
+  .stock-card-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .card-field label {
+    font-size: 9px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: block;
+    margin-bottom: 3px;
+  }
+  .card-field .field-val {
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 5px 8px;
+    font-size: 12px;
+    color: var(--text-dim);
+    width: 100%;
+  }
+  .card-field .field-val.is-pct   { color: var(--accent-lt); font-weight: 600; }
+  .card-field .field-val.is-buy   { color: var(--accent-lt); font-weight: 700; background: var(--accent-bg); border-color: var(--accent-bdr); }
+  .card-field input.field-val     { color: var(--text); }
+
+  .footer-bar { flex-wrap: wrap; }
+  .free-input { width: 100%; }
+  .calc-btn   { width: 100%; margin-left: 0; }
+}

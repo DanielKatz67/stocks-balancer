@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="container">
+  <main class="container">
     <header class="app-header">
       <h1 class="app-title">Stock Balancer</h1>
       <span class="total-display" id="totalDisplay"></span>
@@ -23,7 +23,7 @@
             <th class="col-current">Current %</th>
             <th class="col-target">Target %</th>
             <th class="col-buy">Buy (₪)</th>
-            <th class="col-remove"></th>
+            <th class="col-remove"><span class="visually-hidden">Remove</span></th>
           </tr>
         </thead>
         <tbody id="stocksBody"></tbody>
@@ -46,7 +46,7 @@
 
     <p class="new-alloc" id="newAlloc" hidden></p>
     <p class="unallocated-notice" id="unallocatedNotice" hidden></p>
-  </div>
+  </main>
   <script src="app.js"></script>
 </body>
 </html>
