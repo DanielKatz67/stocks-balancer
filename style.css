@@ -136,7 +136,7 @@ tfoot .col-buy { font-weight: 700; color: var(--accent); }
 
 input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; border-color: var(--accent); }
 
-input[type="number"]:invalid { border-color: var(--red); }
+input[type="number"]:invalid { border-color: var(--border); }
 
 /* Remove button */
 .remove-btn {

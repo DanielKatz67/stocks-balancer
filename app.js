@@ -109,12 +109,12 @@ function renderTable() {
       </td>
       <td>
         <input class="amount-input" data-id="${stock.id}" data-field="amount"
-               type="number" min="0" step="any" placeholder="0" value="${stock.amount || ''}">
+               type="number" min="0" step="500" placeholder="0" value="${stock.amount || ''}">
       </td>
       <td class="current-pct" data-pct-id="${stock.id}">${currentPct(stock).toFixed(1)}%</td>
       <td>
         <input class="target-input" data-id="${stock.id}" data-field="target"
-               type="number" min="0" max="100" step="any" placeholder="0"
+               type="number" min="0" max="100" step="5" placeholder="0"
                value="${state.targets[stock.id] || ''}">
       </td>
       <td class="col-buy">${buy !== null ? '₪' + buy : '—'}</td>
@@ -178,7 +178,7 @@ function renderCards() {
         <div class="card-field">
           <label>Amount (₪)</label>
           <input class="field-val" data-id="${stock.id}" data-field="amount"
-                 type="number" min="0" step="any" placeholder="0" value="${stock.amount || ''}">
+                 type="number" min="0" step="500" placeholder="0" value="${stock.amount || ''}">
         </div>
         <div class="card-field">
           <label>Current %</label>
@@ -187,7 +187,7 @@ function renderCards() {
         <div class="card-field">
           <label>Target %</label>
           <input class="field-val" data-id="${stock.id}" data-field="target"
-                 type="number" min="0" max="100" step="any" placeholder="0"
+                 type="number" min="0" max="100" step="5" placeholder="0"
                  value="${state.targets[stock.id] || ''}">
         </div>
         <div class="card-field">
@@ -243,21 +243,6 @@ function renderResults() {
 }
 
 // ── Events ─────────────────────────────────────────────────────────────
-
-document.addEventListener('keydown', e => {
-  if (e.key !== 'ArrowUp' && e.key !== 'ArrowDown') return;
-  const field = e.target.dataset.field;
-  const isAmount = field === 'amount' || e.target.id === 'freeCashInput';
-  const isTarget = field === 'target';
-  if (!isAmount && !isTarget) return;
-  e.preventDefault();
-  const step = isAmount ? 500 : 5;
-  const delta = e.key === 'ArrowUp' ? step : -step;
-  const current = parseFloat(e.target.value) || 0;
-  const next = Math.max(0, current + delta);
-  e.target.value = next;
-  e.target.dispatchEvent(new Event('input', { bubbles: true }));
-});
 
 document.addEventListener('input', e => {
   const id = e.target.dataset.id ? Number(e.target.dataset.id) : null;
