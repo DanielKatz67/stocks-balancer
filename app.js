@@ -109,12 +109,12 @@ function renderTable() {
       </td>
       <td>
         <input class="amount-input" data-id="${stock.id}" data-field="amount"
-               type="number" min="0" step="1" placeholder="0" value="${stock.amount || ''}">
+               type="number" min="0" step="500" placeholder="0" value="${stock.amount || ''}">
       </td>
       <td class="current-pct" data-pct-id="${stock.id}">${currentPct(stock).toFixed(1)}%</td>
       <td>
         <input class="target-input" data-id="${stock.id}" data-field="target"
-               type="number" min="0" max="100" step="1" placeholder="0"
+               type="number" min="0" max="100" step="5" placeholder="0"
                value="${state.targets[stock.id] || ''}">
       </td>
       <td class="col-buy">${buy !== null ? '₪' + buy : '—'}</td>
@@ -178,7 +178,7 @@ function renderCards() {
         <div class="card-field">
           <label>Amount (₪)</label>
           <input class="field-val" data-id="${stock.id}" data-field="amount"
-                 type="number" min="0" step="1" placeholder="0" value="${stock.amount || ''}">
+                 type="number" min="0" step="500" placeholder="0" value="${stock.amount || ''}">
         </div>
         <div class="card-field">
           <label>Current %</label>
@@ -187,7 +187,7 @@ function renderCards() {
         <div class="card-field">
           <label>Target %</label>
           <input class="field-val" data-id="${stock.id}" data-field="target"
-                 type="number" min="0" max="100" step="1" placeholder="0"
+                 type="number" min="0" max="100" step="5" placeholder="0"
                  value="${state.targets[stock.id] || ''}">
         </div>
         <div class="card-field">
