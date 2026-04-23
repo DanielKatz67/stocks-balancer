@@ -1,4 +1,4 @@
-# Stock Balancer
+# Rebalance Portfolio
 
 A client-side NIS portfolio rebalancing calculator.
 
