@@ -28,7 +28,7 @@ body {
 
 /* ── Container ── */
 .container {
-  max-width: 680px;
+  max-width: 860px;
   margin: 0 auto;
 }
 
@@ -50,6 +50,18 @@ body {
   color: var(--accent-lt);
   font-weight: 600;
 }
+
+/* ── Description ── */
+.app-desc {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 20px;
+  line-height: 1.6;
+}
+.app-desc ol {
+  margin: 6px 0 0 16px;
+}
+.app-desc li { margin-bottom: 2px; }
 
 /* ── Table (desktop) ── */
 .table-wrap {
