@@ -203,6 +203,18 @@ input[type="number"]:invalid { border-color: var(--border); }
 }
 .calc-btn:disabled { background: var(--border); color: var(--text-muted); cursor: not-allowed; }
 
+/* ── Mobile target sum indicator (hidden on desktop) ── */
+.target-sum-mobile { display: none; }
+
+@media (max-width: 639px) {
+  .target-sum-mobile {
+    display: block;
+    font-size: 11px;
+    margin-bottom: 8px;
+  }
+  .target-sum-mobile--err { color: var(--red); font-weight: 600; }
+}
+
 /* ── Post-calculate messages ── */
 .new-alloc {
   font-size: 12px;

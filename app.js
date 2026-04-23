@@ -205,6 +205,17 @@ function renderFooter() {
   const fc = state.freeCash;
   const btn = document.getElementById('calcBtn');
   btn.disabled = !(ts === 100 && fc > 0);
+
+  const mobileSum = document.getElementById('targetSumMobile');
+  if (mobileSum) {
+    if (ts === 100) {
+      mobileSum.textContent = '';
+      mobileSum.className = 'target-sum-mobile';
+    } else {
+      mobileSum.textContent = `Targets sum to ${ts}% — must equal 100%`;
+      mobileSum.className = 'target-sum-mobile target-sum-mobile--err';
+    }
+  }
 }
 
 function renderResults() {
