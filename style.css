@@ -83,7 +83,7 @@ body {
   border-bottom: 1px solid var(--border-dim);
 }
 .stocks-table thead th.col-name { text-align: left; }
-.stocks-table thead th.col-buy  { color: var(--accent); }
+.stocks-table thead th.col-buy  { color: var(--green); }
 
 .stocks-table tbody td {
   padding: 9px 10px;
@@ -107,10 +107,10 @@ body {
 .col-buy {
   background: var(--accent-bg);
   border-left: 1px solid var(--accent-bdr);
-  color: var(--accent-lt);
+  color: var(--green);
   font-weight: 700;
 }
-tfoot .col-buy { font-weight: 700; color: var(--accent); }
+tfoot .col-buy { font-weight: 700; color: var(--green); }
 
 .col-remove { width: 32px; text-align: center; }
 
@@ -281,7 +281,7 @@ input[type="number"]:invalid { border-color: var(--border); }
     width: 100%;
   }
   .card-field .field-val.is-pct   { color: var(--accent-lt); font-weight: 600; border: none; background: none; padding-left: 0; }
-  .card-field .field-val.is-buy   { color: var(--accent-lt); font-weight: 700; background: var(--accent-bg); border-color: var(--accent-bdr); }
+  .card-field .field-val.is-buy   { color: var(--green); font-weight: 700; background: var(--accent-bg); border-color: var(--accent-bdr); }
   .card-field input.field-val     { color: var(--text); }
 
   .footer-bar { flex-wrap: wrap; }
