@@ -58,10 +58,6 @@ body {
   margin-bottom: 20px;
   line-height: 1.6;
 }
-.app-desc ol {
-  margin: 6px 0 0 16px;
-}
-.app-desc li { margin-bottom: 2px; }
 
 /* ── Table (desktop) ── */
 .table-wrap {
