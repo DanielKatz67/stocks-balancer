@@ -242,40 +242,45 @@ input[type="number"]:invalid { border-color: var(--border); }
   .stock-card {
     background: var(--bg-card);
     border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 14px;
-    margin-bottom: 10px;
+    border-radius: 8px;
+    padding: 8px 10px;
+    margin-bottom: 6px;
   }
   .stock-card-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 10px;
+    margin-bottom: 6px;
   }
-  .stock-card-header .name-input { width: 100%; font-size: 13px; font-weight: 600; }
+  .stock-card-header .name-input { width: 100%; font-size: 12px; font-weight: 600; }
   .stock-card-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 8px;
+    gap: 4px 8px;
+  }
+  .card-field {
+    display: flex;
+    align-items: center;
+    gap: 6px;
   }
   .card-field label {
     font-size: 9px;
     color: var(--text-muted);
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    display: block;
-    margin-bottom: 3px;
+    white-space: nowrap;
+    flex-shrink: 0;
   }
   .card-field .field-val {
     background: var(--bg-input);
     border: 1px solid var(--border);
-    border-radius: 5px;
-    padding: 5px 8px;
-    font-size: 12px;
+    border-radius: 4px;
+    padding: 3px 6px;
+    font-size: 11px;
     color: var(--text-dim);
     width: 100%;
   }
-  .card-field .field-val.is-pct   { color: var(--accent-lt); font-weight: 600; }
+  .card-field .field-val.is-pct   { color: var(--accent-lt); font-weight: 600; border: none; background: none; padding-left: 0; }
   .card-field .field-val.is-buy   { color: var(--accent-lt); font-weight: 700; background: var(--accent-bg); border-color: var(--accent-bdr); }
   .card-field input.field-val     { color: var(--text); }
 
