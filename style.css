@@ -297,6 +297,9 @@ input[type="number"]:invalid { border-color: var(--border); }
   .card-field input.field-val     { color: var(--text); }
 
   .footer-bar { flex-wrap: wrap; }
-  .free-input { width: 100%; }
+  .free-input { width: 100%; font-size: 16px; }
   .calc-btn   { width: 100%; margin-left: 0; }
+
+  /* Prevent iOS auto-zoom on focus */
+  input[type="number"], input[type="text"] { font-size: 16px; }
 }
