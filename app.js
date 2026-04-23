@@ -97,7 +97,6 @@ function render() {
 
 function renderTable() {
   const tbody = document.getElementById('stocksBody');
-  const tfoot = document.getElementById('stocksFoot');
   tbody.innerHTML = '';
 
   state.stocks.forEach(stock => {
@@ -112,7 +111,7 @@ function renderTable() {
         <input class="amount-input" data-id="${stock.id}" data-field="amount"
                type="number" min="0" placeholder="0" value="${stock.amount || ''}">
       </td>
-      <td class="current-pct">${currentPct(stock).toFixed(1)}%</td>
+      <td class="current-pct" data-pct-id="${stock.id}">${currentPct(stock).toFixed(1)}%</td>
       <td>
         <input class="target-input" data-id="${stock.id}" data-field="target"
                type="number" min="0" max="100" placeholder="0"
@@ -127,16 +126,23 @@ function renderTable() {
     tbody.appendChild(tr);
   });
 
+  renderTfoot();
+}
+
+function renderTfoot() {
+  const tfoot = document.getElementById('stocksFoot');
+  if (!tfoot) return;
   const ts = targetSum();
   const totalBuy = state.results
     ? Object.values(state.results.buy).reduce((s, v) => s + v, 0)
     : null;
+  const grandTotal = total() + state.freeCash;
 
   tfoot.innerHTML = `
     <tr>
       <td class="col-name"></td>
       <td style="text-align:right;color:var(--text);font-weight:600">
-        ₪${total().toLocaleString()}
+        ₪${grandTotal.toLocaleString()}
       </td>
       <td style="text-align:right;color:var(--text-dim)">100%</td>
       <td style="text-align:right">
@@ -150,7 +156,7 @@ function renderTable() {
   `;
 
   document.getElementById('totalDisplay').textContent =
-    total() > 0 ? `Total: ₪${total().toLocaleString()}` : '';
+    grandTotal > 0 ? `Total: ₪${grandTotal.toLocaleString()}` : '';
 }
 
 function renderCards() {
@@ -176,7 +182,7 @@ function renderCards() {
         </div>
         <div class="card-field">
           <label>Current %</label>
-          <div class="field-val is-pct">${currentPct(stock).toFixed(1)}%</div>
+          <div class="field-val is-pct" data-pct-id="${stock.id}">${currentPct(stock).toFixed(1)}%</div>
         </div>
         <div class="card-field">
           <label>Target %</label>
@@ -249,7 +255,18 @@ document.addEventListener('input', e => {
   if (id && field === 'amount') {
     state.stocks.find(s => s.id === id).amount = parseFloat(e.target.value) || 0;
     state.results = null;
-    render();
+    // Patch current % cells in-place (avoids wiping tbody and losing focus)
+    state.stocks.forEach(st => {
+      const pctEl = document.querySelector(`td[data-pct-id="${st.id}"]`);
+      if (pctEl) pctEl.textContent = currentPct(st).toFixed(1) + '%';
+      const cardPctEl = document.querySelector(`div[data-pct-id="${st.id}"]`);
+      if (cardPctEl) cardPctEl.textContent = currentPct(st).toFixed(1) + '%';
+    });
+    document.querySelectorAll('tbody .col-buy').forEach(td => { td.textContent = '—'; });
+    document.querySelectorAll('#stocksFoot .col-buy').forEach(td => { td.textContent = '—'; });
+    document.querySelectorAll('.card-field .is-buy').forEach(div => { div.textContent = '—'; });
+    renderFooter();
+    renderTfoot();
     return;
   }
   if (id && field === 'target') {
@@ -274,6 +291,7 @@ document.addEventListener('input', e => {
     state.freeCash = parseFloat(e.target.value) || 0;
     state.results = null;
     renderFooter();
+    renderTfoot();
   }
 });
 
